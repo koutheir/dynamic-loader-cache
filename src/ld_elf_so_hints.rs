@@ -6,6 +6,7 @@
 
 //! Cache of the FreeBSD dynamic loader.
 
+use core::iter::FusedIterator;
 use core::mem::size_of;
 use std::borrow::Cow;
 use std::fs::read_dir;
@@ -152,7 +153,7 @@ impl Cache {
     }
 
     /// Return an iterator that returns cache entries.
-    pub fn iter(&self) -> Result<impl Iterator<Item = Result<crate::Entry<'_>>> + '_> {
+    pub fn iter(&self) -> Result<impl FusedIterator<Item = Result<crate::Entry<'_>>> + '_> {
         let start = self.dir_list_offset as usize;
         let bytes = &self.map[start..start.saturating_add(self.dir_list_size as usize)];
 
@@ -186,7 +187,7 @@ impl Cache {
 impl CacheProvider for Cache {
     fn entries_iter<'cache>(
         &'cache self,
-    ) -> Result<Box<dyn Iterator<Item = Result<crate::Entry<'cache>>> + 'cache>> {
+    ) -> Result<Box<dyn FusedIterator<Item = Result<crate::Entry<'cache>>> + 'cache>> {
         let iter = self.iter()?;
         Ok(Box::new(iter))
     }

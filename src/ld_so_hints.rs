@@ -7,6 +7,7 @@
 //! Cache of the OpenBSD or NetBSD dynamic loader.
 
 use core::ffi::{c_int, CStr};
+use core::iter::FusedIterator;
 use core::mem::size_of;
 use std::path::{Path, PathBuf};
 
@@ -212,7 +213,7 @@ impl Cache {
     }
 
     /// Return an iterator that returns cache entries.
-    pub fn iter(&self) -> Result<impl Iterator<Item = Result<crate::Entry<'_>>> + '_> {
+    pub fn iter(&self) -> Result<impl FusedIterator<Item = Result<crate::Entry<'_>>> + '_> {
         let hash_table_end = self
             .hash_table
             .saturating_add(self.bucket_count.saturating_mul(size_of::<Bucket>()));
@@ -233,7 +234,7 @@ impl Cache {
 impl CacheProvider for Cache {
     fn entries_iter<'cache>(
         &'cache self,
-    ) -> Result<Box<dyn Iterator<Item = Result<crate::Entry<'cache>>> + 'cache>> {
+    ) -> Result<Box<dyn FusedIterator<Item = Result<crate::Entry<'cache>>> + 'cache>> {
         let iter = self.iter()?;
         Ok(Box::new(iter))
     }
@@ -290,22 +291,13 @@ impl<'cache> Iterator for Iter<'cache> {
             Some(self.next_fallible())
         }
     }
-}
 
-#[cfg(test)]
-fn print_cache(cache: &Cache) {
-    for e in cache.iter().unwrap() {
-        let e = e.unwrap();
-        eprintln!(
-            "{} => {}",
-            e.file_name.to_string_lossy(),
-            e.full_path.display()
-        );
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let remaining = self.hash_table.len() / size_of::<Bucket>();
+        (remaining, Some(remaining))
     }
 }
 
-#[test]
-fn test1() {
-    let cache = Cache::load("tests/ld.so.hints/ld.so.hints").unwrap();
-    print_cache(&cache);
-}
+impl<'cache> FusedIterator for Iter<'cache> {}
+
+impl<'cache> ExactSizeIterator for Iter<'cache> {}

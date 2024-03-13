@@ -7,6 +7,7 @@
 //! Cache of the GNU/Linux dynamic loader.
 
 use core::ffi::CStr;
+use core::iter::FusedIterator;
 use core::mem::size_of;
 use std::path::{Path, PathBuf};
 
@@ -137,7 +138,7 @@ impl Cache {
     }
 
     /// Return an iterator that returns cache entries.
-    pub fn iter(&self) -> Result<impl Iterator<Item = Result<crate::Entry<'_>>> + '_> {
+    pub fn iter(&self) -> Result<impl FusedIterator<Item = Result<crate::Entry<'_>>> + '_> {
         let entries_end = size_of::<Header>()
             .saturating_add(size_of::<Entry>().saturating_mul(self.lib_count as usize));
         let entries_bytes = &self.map[size_of::<Header>()..entries_end];
@@ -154,7 +155,7 @@ impl Cache {
 impl CacheProvider for Cache {
     fn entries_iter<'cache>(
         &'cache self,
-    ) -> Result<Box<dyn Iterator<Item = Result<crate::Entry<'cache>>> + 'cache>> {
+    ) -> Result<Box<dyn FusedIterator<Item = Result<crate::Entry<'cache>>> + 'cache>> {
         let iter = self.iter()?;
         Ok(Box::new(iter))
     }
@@ -211,22 +212,13 @@ impl<'cache> Iterator for Iter<'cache> {
             Some(self.next_fallible())
         }
     }
-}
 
-#[cfg(test)]
-fn print_cache(cache: &Cache) {
-    for e in cache.iter().unwrap() {
-        let e = e.unwrap();
-        eprintln!(
-            "{} => {}",
-            e.file_name.to_string_lossy(),
-            e.full_path.display()
-        );
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let remaining = self.entries_bytes.len() / size_of::<Entry>();
+        (remaining, Some(remaining))
     }
 }
 
-#[test]
-fn test1() {
-    let cache = Cache::load("tests/glibc-ld.so.cache1.1/ld.so.cache").unwrap();
-    print_cache(&cache);
-}
+impl<'cache> FusedIterator for Iter<'cache> {}
+
+impl<'cache> ExactSizeIterator for Iter<'cache> {}

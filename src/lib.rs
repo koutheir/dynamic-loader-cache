@@ -63,6 +63,7 @@ pub mod ld_so_1dot7;
 pub mod ld_so_hints;
 mod utils;
 
+use core::iter::FusedIterator;
 use core::mem::size_of;
 use std::borrow::Cow;
 use std::ffi::OsStr;
@@ -102,7 +103,7 @@ pub struct Entry<'cache> {
 trait CacheProvider: fmt::Debug + Sync + Send {
     fn entries_iter<'cache>(
         &'cache self,
-    ) -> Result<Box<dyn Iterator<Item = Result<Entry<'cache>>> + 'cache>>;
+    ) -> Result<Box<dyn FusedIterator<Item = Result<Entry<'cache>>> + 'cache>>;
 }
 
 #[derive(Debug)]
@@ -194,7 +195,7 @@ impl Cache {
     /// Returns an iterator that returns the cache entries.
     ///
     /// The entries are aggregated from all dynamic loader caches that have been previously loaded.
-    pub fn iter(&self) -> Result<impl Iterator<Item = Result<Entry<'_>>> + '_> {
+    pub fn iter(&self) -> Result<impl FusedIterator<Item = Result<Entry<'_>>> + '_> {
         Ok(self
             .caches
             .iter()
@@ -202,7 +203,8 @@ impl Cache {
             .map(CacheProvider::entries_iter)
             .collect::<Result<ArrayVec<_, CACHE_IMPL_COUNT>>>()?
             .into_iter()
-            .flatten())
+            .flatten()
+            .fuse())
     }
 }
 
