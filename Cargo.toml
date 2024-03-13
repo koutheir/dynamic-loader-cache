@@ -6,7 +6,7 @@
 
 [package]
 name          = "dynamic-loader-cache"
-version       = "0.1.0"                                                           # Remember to update `html_root_url`.
+version       = "0.1.1"                                                           # Remember to update `html_root_url`.
 authors       = ["Koutheir Attouchi <koutheir@gmail.com>"]
 license       = "MIT"
 description   = "Reader of the dynamic loader shared libraries cache"
