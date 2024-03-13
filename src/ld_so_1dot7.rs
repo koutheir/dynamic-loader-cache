@@ -6,6 +6,9 @@
 
 //! Cache of the GNU/Linux old dynamic loader.
 
+#[cfg(test)]
+mod tests;
+
 use core::ffi::{c_uint, CStr};
 use core::iter::FusedIterator;
 use core::mem::size_of;

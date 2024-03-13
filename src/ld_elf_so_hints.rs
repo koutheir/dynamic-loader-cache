@@ -6,6 +6,9 @@
 
 //! Cache of the FreeBSD dynamic loader.
 
+#[cfg(test)]
+mod tests;
+
 use core::iter::FusedIterator;
 use core::mem::size_of;
 use std::borrow::Cow;
@@ -193,28 +196,4 @@ impl CacheProvider for Cache {
         let iter = self.iter()?;
         Ok(Box::new(iter))
     }
-}
-
-#[cfg(test)]
-fn print_cache(cache: &Cache) {
-    for e in cache.iter().unwrap() {
-        let e = e.unwrap();
-        eprintln!(
-            "{} => {}",
-            e.file_name.to_string_lossy(),
-            e.full_path.display()
-        );
-    }
-}
-
-#[test]
-fn test1() {
-    let cache = Cache::load("tests/ld-elf.so.hints/ld-elf.so.hints").unwrap();
-    print_cache(&cache);
-}
-
-#[test]
-fn test2() {
-    let cache = Cache::load("tests/ld-elf.so.hints/ld-elf32.so.hints").unwrap();
-    print_cache(&cache);
 }

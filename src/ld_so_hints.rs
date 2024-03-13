@@ -6,6 +6,9 @@
 
 //! Cache of the OpenBSD or NetBSD dynamic loader.
 
+#[cfg(test)]
+mod tests;
+
 use core::ffi::{c_int, CStr};
 use core::iter::FusedIterator;
 use core::mem::size_of;
