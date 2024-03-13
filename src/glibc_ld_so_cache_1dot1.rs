@@ -47,10 +47,6 @@ struct Entry {
     hw_cap: u64,
 }
 
-const MAX_LIB_COUNT: u32 = u32::MAX
-    .saturating_sub(size_of::<Header>() as u32)
-    .saturating_div(size_of::<Entry>() as u32);
-
 /// Cache of the GNU/Linux dynamic loader.
 ///
 /// This loads a dynamic loader cache file (*e.g.*, `/etc/ld.so.cache`),
@@ -111,16 +107,23 @@ impl Cache {
             ),
         ))(bytes)?;
 
-        if lib_count > MAX_LIB_COUNT {
+        let max_lib_count = bytes
+            .len()
+            .saturating_sub(size_of::<Header>())
+            .saturating_div(size_of::<Entry>()) as u32;
+
+        if lib_count > max_lib_count {
             return Err(nom::Err::Error(nom::error::make_error(
                 bytes,
                 nom::error::ErrorKind::TooLarge,
             )));
         }
 
-        let max_string_table_size = u32::MAX
-            .saturating_sub(size_of::<Header>() as u32)
-            .saturating_sub(lib_count.saturating_mul(size_of::<Entry>() as u32));
+        let max_string_table_size = bytes
+            .len()
+            .saturating_sub(size_of::<Header>())
+            .saturating_sub((lib_count as usize).saturating_mul(size_of::<Entry>()))
+            as u32;
 
         if string_table_size > max_string_table_size {
             return Err(nom::Err::Error(nom::error::make_error(
@@ -132,6 +135,7 @@ impl Cache {
         let min_size = size_of::<Header>()
             .saturating_add(size_of::<Entry>().saturating_mul(lib_count as usize))
             .saturating_add(string_table_size as usize);
+
         nom_peek(nom_take(min_size))(bytes)?;
 
         Ok((input, lib_count))

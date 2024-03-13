@@ -115,22 +115,24 @@ impl Cache {
                 ),
             ))(bytes)?;
 
-        if string_table_size > u32::MAX.saturating_sub(string_table_offset) {
+        let size_after_string_table =
+            bytes.len().saturating_sub(string_table_offset as usize) as u32;
+
+        if string_table_size > size_after_string_table {
             return Err(nom::Err::Error(nom::error::make_error(
                 bytes,
                 nom::error::ErrorKind::TooLarge,
             )));
         }
 
-        if dir_list_offset > u32::MAX.saturating_sub(string_table_offset) {
+        if dir_list_offset > size_after_string_table {
             return Err(nom::Err::Error(nom::error::make_error(
                 bytes,
                 nom::error::ErrorKind::TooLarge,
             )));
         }
 
-        let max_dir_list_size = u32::MAX
-            .saturating_sub(string_table_offset)
+        let max_dir_list_size = size_after_string_table
             .saturating_sub(dir_list_offset)
             .saturating_sub(1);
         if dir_list_size > max_dir_list_size {

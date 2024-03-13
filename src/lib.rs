@@ -4,8 +4,6 @@
 // Licensed under the MIT license. This file may not be copied, modified,
 // or distributed except according to those terms.
 
-// TODO(KAT): Allow access to specific cache files.
-
 #![doc = include_str!("../README.md")]
 #![doc(html_root_url = "https://docs.rs/dynamic-loader-cache/0.1.0")]
 #![warn(

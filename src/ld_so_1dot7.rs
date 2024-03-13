@@ -42,10 +42,6 @@ struct Entry {
     value: u32,
 }
 
-const MAX_LIB_COUNT: u32 = u32::MAX
-    .saturating_sub(size_of::<Header>() as u32)
-    .saturating_div(size_of::<Entry>() as u32);
-
 /// Cache of the GNU/Linux old dynamic loader.
 ///
 /// This loads a dynamic loader cache file (*e.g.*, `/etc/ld.so.cache`),
@@ -89,7 +85,12 @@ impl Cache {
             nom_u32(Endianness::Native),
         )(bytes)?;
 
-        if lib_count > MAX_LIB_COUNT {
+        let max_lib_count = bytes
+            .len()
+            .saturating_sub(size_of::<Header>())
+            .saturating_div(size_of::<Entry>()) as u32;
+
+        if lib_count > max_lib_count {
             return Err(nom::Err::Error(nom::error::make_error(
                 bytes,
                 nom::error::ErrorKind::TooLarge,

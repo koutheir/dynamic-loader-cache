@@ -33,6 +33,7 @@ const MAGIC_LE64: [u8; 8] = (MAGIC as u64).to_le_bytes();
 const MAGIC_BE64: [u8; 8] = (MAGIC as u64).to_le_bytes();
 
 //const VERSION_1: u32 = 1; // We do not support this ancient version.
+
 const VERSION_2: u32 = 2;
 const VERSION_2_LE32: [u8; 4] = VERSION_2.to_le_bytes();
 const VERSION_2_BE32: [u8; 4] = VERSION_2.to_be_bytes();
