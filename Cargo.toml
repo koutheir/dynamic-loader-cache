@@ -6,15 +6,15 @@
 
 [package]
 name          = "dynamic-loader-cache"
-version       = "0.1.1"                                                           # Remember to update `html_root_url`.
+version       = "0.1.2"                                                           # Remember to update `html_root_url`.
 authors       = ["Koutheir Attouchi <koutheir@gmail.com>"]
 license       = "MIT"
 description   = "Reader of the dynamic loader shared libraries cache"
 edition       = "2021"
 documentation = "https://docs.rs/dynamic-loader-cache"
 readme        = "README.md"
-homepage      = "https://github.com/koutheir/dynamic-loader-cache"
-repository    = "https://github.com/koutheir/dynamic-loader-cache"
+homepage      = "https://codeberg.org/koutheir/dynamic-loader-cache"
+repository    = "https://codeberg.org/koutheir/dynamic-loader-cache"
 categories    = ["caching", "database", "parser-implementations"]
 keywords      = ["loader", "linker", "library", "ld-so-cache", "ld-elf-so-hints"]
 
@@ -23,7 +23,6 @@ keywords      = ["loader", "linker", "library", "ld-so-cache", "ld-elf-so-hints"
 [dependencies]
 thiserror         = { version = "1.0" }
 memmap2           = { version = "0.9" }
-memoffset         = { version = "0.9" }
 arrayvec          = { version = "0.7" }
 nom               = { version = "7.1" }
 static_assertions = { version = "1.1" }

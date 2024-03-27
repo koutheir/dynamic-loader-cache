@@ -1,7 +1,6 @@
-use core::mem::size_of;
+use core::mem::{offset_of, size_of};
 use std::io::{Cursor, Write};
 
-use memoffset::offset_of;
 use proptest::prelude::*;
 
 use super::{Cache, Entry, Header, MAGIC};

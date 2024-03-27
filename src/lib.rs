@@ -5,7 +5,7 @@
 // or distributed except according to those terms.
 
 #![doc = include_str!("../README.md")]
-#![doc(html_root_url = "https://docs.rs/dynamic-loader-cache/0.1.1")]
+#![doc(html_root_url = "https://docs.rs/dynamic-loader-cache/0.1.2")]
 #![warn(
     unsafe_op_in_unsafe_fn,
     missing_docs,

@@ -1,8 +1,7 @@
-use core::mem::size_of;
+use core::mem::{offset_of, size_of};
 use std::io::{Cursor, Write};
 
 use assert_matches::assert_matches;
-use memoffset::offset_of;
 use nom::number::Endianness;
 use proptest::prelude::*;
 

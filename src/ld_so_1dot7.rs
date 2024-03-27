@@ -11,11 +11,10 @@ mod tests;
 
 use core::ffi::{c_uint, CStr};
 use core::iter::FusedIterator;
-use core::mem::size_of;
+use core::mem::{offset_of, size_of};
 use std::path::{Path, PathBuf};
 
 use memmap2::Mmap;
-use memoffset::offset_of;
 use nom::bytes::complete::{tag as nom_tag, take as nom_take};
 use nom::combinator::peek as nom_peek;
 use nom::number::complete::u32 as nom_u32;
